@@ -1,0 +1,14 @@
+# Minimal tor config for a public obfs4 bridge
+# For futher discussion of ORPort settings, see
+# https://trac.torproject.org/projects/tor/ticket/7349
+
+SOCKSPort 0               # no local SOCKS proxy
+ORPort auto               # attempt to hide ORPort from active probes
+ExtORPort auto            # configure ExtORPort for obfs4proxy
+ExitPolicy reject *:*     # no exits allowed
+BridgeRelay 1             # relay won't show up in the public consensus
+PublishServerDescriptor 1 # publish to the bridge authority
+
+# use obfs4proxy to provide obfs4 on port 80
+ServerTransportPlugin obfs4 exec /usr/local/bin/obfs4proxy
+ServerTransportListenAddr obfs4 0.0.0.0:80
