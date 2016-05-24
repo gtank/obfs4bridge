@@ -9,6 +9,13 @@ ExitPolicy reject *:*     # no exits allowed
 BridgeRelay 1             # relay won't show up in the public consensus
 PublishServerDescriptor 1 # publish to the bridge authority
 
+# Some wild guesses at reasonable bandwidth settings.
+# You probably want to change these.
+RelayBandwidthRate 100KBytes
+RelayBandwidthBurst 300KBytes
+AccountingMax 250GBytes
+AccountingStart month 1 00:00
+
 # use obfs4proxy to provide obfs4 on port 80
 ServerTransportPlugin obfs4 exec /usr/local/bin/obfs4proxy
 ServerTransportListenAddr obfs4 0.0.0.0:80
