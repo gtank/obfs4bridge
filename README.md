@@ -3,7 +3,7 @@ bridge on port 80. The combination of common port and the obfs4 protocol should
 make it difficult for ISPs, universities, employers, or other network censors
 to block.
 
-To run a public bridge:
+Running an ephemeral public bridge is a one-liner:
 ```
 docker run -d \
            --restart always \
@@ -15,24 +15,27 @@ docker run -d \
 And you're done! Make sure port 80 is accessible on your host and Tor will take
 care of telling the bridge authority about your relay.
 
-A public bridge helps the most people but carries the risk of being blocked as
-more people use it. If you want a stealthier bridge for your own use, you can
-opt to run a private bridge.
-
-To run a private bridge, start the container:
+To persist keys beyond the container's lifetime, including across system
+reboots, you'll need to bind mount over tor's data directory:
 ```
 docker run -d \
            --restart always \
            -v /etc/localtime:/etc/localtime:ro \
+           -v ~/.tor:/var/lib/tor \
            -p 80:80 \
-           --name obfs4 \
-           gtank/obfs4bridge -f /etc/tor/torrc.private
+           --name obfs4bridge \
+           gtank/obfs4bridge -f /etc/tor/torrc.public
 ```
 
-To generate a valid bridge line you'll need to get a shell in the running
-container and dump the bridgeline template:
+A public bridge helps the most people but carries the risk of being blocked as
+more people use it. If you want a stealthier bridge for your own use, you can
+opt to run a private bridge.
+
+To run a private bridge, start the container with `-f /etc/tor/torrc.private` instead.
+
+To use your bridge you'll need to dump the bridgeline template. If you've
+mounted the data directory at ~/.tor you can read it with:
 ```
-docker exec -it <CONTAINER ID> sh
 $ cat ~/.tor/pt_state/obfs4_bridgeline.txt
 ```
 
@@ -40,5 +43,3 @@ You'll see the configuration line at the bottom of the file. Replace the
 placeholder values with the IP address of your server, the fingerprint from
 `~/.tor/fingerprint`, and port number 80 and it's ready to be used in either
 tor itself or TBB.
-
-h/t to jfrazelle for the structure of this repo
