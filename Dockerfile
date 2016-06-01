@@ -19,9 +19,12 @@ RUN apk add tor --update-cache --repository http://dl-4.alpinelinux.org/alpine/e
 # Remove cache to reduce image size.
 RUN rm -rf /var/cache/apk/*
 
-# Install obfs4proxy.
-RUN go get github.com/yawning/obfs4/obfs4proxy
+# Install obfs4proxy
+RUN go get git.torproject.org/pluggable-transports/obfs4.git/obfs4proxy
 RUN mv /go/bin/obfs4proxy /usr/local/bin/obfs4proxy
+
+# Give obfs4proxy the capability to bind port 80. This line isn't necessary if
+# you use a high (unprivileged) port.
 RUN setcap 'cap_net_bind_service=+ep' /usr/local/bin/obfs4proxy
 
 # Copy both tor configs to the image.
@@ -35,5 +38,3 @@ EXPOSE 80
 # Run tor as a nonprivileged user.
 RUN chown -R tor /etc/tor
 USER tor
-
-ENTRYPOINT ["tor"]
