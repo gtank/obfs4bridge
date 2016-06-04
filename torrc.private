@@ -8,7 +8,7 @@ ExtORPort auto             # configure ExtORPort for obfs4proxy
 ExitPolicy reject *:*      # no exits allowed
 BridgeRelay 1              # relay won't show up in the public consensus
 PublishServerDescriptor 0  # don't publish to the bridge authority
-DataDirectory /var/lib/tor # bind mount over this to save keys
+DataDirectory /var/lib/tor # mount from a data container to save keys
 
 # use obfs4proxy to provide obfs4 on port 80
 ServerTransportPlugin obfs4 exec /usr/local/bin/obfs4proxy

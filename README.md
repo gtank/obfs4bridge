@@ -10,7 +10,7 @@ You'll notice that the Dockerfile copies two pre-written torrc (config files) in
 # https://trac.torproject.org/projects/tor/ticket/7349
 
 SOCKSPort 0                # no local SOCKS proxy
-ORPort auto                # attempt to hide ORPort from active probes
+ORPort 6463                # public bridge must have an open ORPort
 ExtORPort auto             # configure ExtORPort for obfs4proxy
 ExitPolicy reject *:*      # no exits allowed
 BridgeRelay 1              # relay won't show up in the public consensus
@@ -31,7 +31,7 @@ ServerTransportListenAddr obfs4 0.0.0.0:80
 
 ### Persisting data
 
-When a tor relay runs for the first time, it will generate keys and cache information about the tor network. To maintain the same relay identity across restarts, we have to persist these keys. We'll do this in Docker is with a [data volume](https://docs.docker.com/engine/userguide/containers/dockervolumes/), which we'll name `tor-data`. Run the following command on your Docker host to create it:
+When a tor relay runs for the first time, it will generate keys and cache information about the tor network. To maintain the same relay identity across restarts, we have to persist these keys. We'll do this in Docker with a [data volume](https://docs.docker.com/engine/userguide/containers/dockervolumes/), which we'll name `tor-data`. Run the following command on your Docker host to create it:
 
 ```
 docker create -v /var/lib/tor --name tor-data gtank/obfs4bridge /bin/true
@@ -41,18 +41,17 @@ We reuse the tor container (here `gtank/obfs4bridge`) because it will already be
 
 ### Running the bridge
 
-With all that out of the way, actually deploying the bridge is a one-liner. Make sure port 80 is open on your docker host, then run the image:
+With all that out of the way, actually deploying the bridge is a one-liner. Make sure ports 80 and 6463 are open on your docker host, then run the image:
 
 ```
 docker run -d \
            --restart always \
            -v /etc/localtime:/etc/localtime:ro \
            --volumes-from tor-data \
+           -p 6463:6463 \
            -p 80:80 \
            --name obfs4bridge \
            gtank/obfs4bridge tor -f /etc/tor/torrc.public
 ```
 
-### Running the bridge
-
-After your bridge is running it will take a few hours for it to show up in BridgeDB. You can check it by fingerprint on https://atlas.torproject.org to see the network's view of it. Once it's there, you'll be helping people with censored connections reach the open internet!
+After your bridge is running it will take a few hours for it to show up in BridgeDB. You can check it by hashed fingerprint on https://atlas.torproject.org to see the network's view of it. Once it's there, you'll be helping people with censored connections reach the open internet!

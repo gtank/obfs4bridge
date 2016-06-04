@@ -7,7 +7,7 @@ RUN apk update
 # Install Go for building obfs4proxy.
 RUN apk add go git ca-certificates
 RUN mkdir -p /go/src /go/bin
-RUN chmod -R 777 /go
+RUN chmod -R 644 /go
 ENV GOPATH /go
 ENV PATH /go/bin:$PATH
 WORKDIR /go
