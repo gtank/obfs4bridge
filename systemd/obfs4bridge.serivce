@@ -1,0 +1,16 @@
+[Unit]
+Description=containerized tor bridge with pluggable transport
+Requires=docker.service
+After=syslog.target network.target nss-lookup.target docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop obfs4bridge
+ExecStartPre=-/usr/bin/docker rm obfs4bridge
+ExecStartPre=-/usr/bin/docker pull gtank/obfs4bridge
+ExecStart=/usr/bin/docker run --name obfs4bridge -v /etc/localtime:/etc/localtime:ro --volumes-from tor-data -p 6463:6463 -p 80:80 gtank/obfs4bridge tor -f /etc/tor/torrc.public
+ExecReload=/usr/bin/docker restart obfs4bridge
+ExecStop=/usr/bin/docker stop obfs4bridge
+Restart=always
+
+[Install]
+WantedBy = multi-user.target
