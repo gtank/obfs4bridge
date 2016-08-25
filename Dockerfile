@@ -14,7 +14,7 @@ WORKDIR /go
 
 # Install tor and obfs4proxy with the ability to bind on low ports.
 RUN apk add libcap
-RUN apk add tor --update-cache --repository http://dl-4.alpinelinux.org/alpine/edge/testing
+RUN apk add tor --update-cache --repository http://dl-4.alpinelinux.org/alpine/edge/community
 
 # Remove cache to reduce image size.
 RUN rm -rf /var/cache/apk/*
